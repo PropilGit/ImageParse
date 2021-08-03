@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Aspose.Words;
 using Aspose.Words.Tables;
@@ -20,11 +21,12 @@ namespace ImageParse.Service
             doc = new Document();
             builder = new DocumentBuilder(doc);
 
+            byte[] image = File.ReadAllBytes("test2.jpg");
             Product[] products = {
-                new Product(1, "Product 1", "111111", 10, "шт"),
-                new Product(1, "Product 1", "111111", 10, "шт"),
-                new Product(1, "Product 1", "111111", 10, "шт"),
-                new Product(1, "Product 1", "111111", 10, "шт")
+                new Product(1, "Product 1", "111111", 10, "шт", image),
+                new Product(1, "Product 1", "111111", 10, "шт", image),
+                new Product(1, "Product 1", "111111", 10, "шт", image),
+                new Product(1, "Product 1", "111111", 10, "шт", image)
             };
 
             AddRow(products);
@@ -40,12 +42,18 @@ namespace ImageParse.Service
                 Table table = builder.StartTable();
 
                 builder.InsertCell();
-                builder.InsertCell();
-                builder.InsertCell();
-                builder.InsertCell();
+                builder.EndRow();
+                //table.AutoFit(AutoFitBehavior.AutoFitToWindow);
+                table.AllowAutoFit = false;
 
+                foreach (var pr in products)
+                {
+                    builder.InsertCell();
+                    builder.InsertImage(pr.Image);
+                }
                 builder.RowFormat.Height = 100;
                 builder.EndRow();
+
 
                 foreach (var pr in products)
                 {
@@ -55,11 +63,9 @@ namespace ImageParse.Service
                         pr.InvNum + "\n" +
                         pr.Count + " " + pr.MeasureUnit);
                 }
-                builder.RowFormat.HeightRule = HeightRule.Auto;
                 builder.EndRow();
 
-                table.AutoFit(AutoFitBehavior.AutoFitToWindow);
-
+                builder.EndTable();
                 return table;
             }
             catch (Exception ex)

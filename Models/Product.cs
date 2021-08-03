@@ -13,6 +13,17 @@ namespace ImageParse.Models
             InvNum = invNum;
             Count = count;
             MeasureUnit = measureUnit;
+            
+        }
+
+        public Product(int id, string name, string invNum, float count, string measureUnit, byte[] image)
+        {
+            Id = id;
+            Name = name;
+            InvNum = invNum;
+            Count = count;
+            MeasureUnit = measureUnit;
+            Image = image;
         }
 
         public int Id { get; private set; }
@@ -20,6 +31,7 @@ namespace ImageParse.Models
         public string InvNum { get; private set; }
         public float Count { get; private set; }
         public string MeasureUnit { get; private set; }
+        public byte[] Image { get; set; }
 
     }
 }

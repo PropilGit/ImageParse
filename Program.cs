@@ -1,5 +1,6 @@
 ﻿using ImageParse.Service;
 using System;
+using System.IO;
 
 namespace ImageParse
 {
@@ -11,6 +12,18 @@ namespace ImageParse
         {
             WordController wC = new WordController();
             wC.onAddLog += AddLog;
+
+            SeleniumController sC = new SeleniumController();
+            sC.onAddLog += AddLog;
+
+
+
+            string dataPath = "testdata.txt";
+            string[] dataLines;
+            if (File.Exists(dataPath)) dataLines = File.ReadAllLines(dataPath);
+            else return;
+
+
 
 
             wC.CreateTable();
