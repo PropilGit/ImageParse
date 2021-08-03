@@ -1,6 +1,7 @@
 ﻿using ImageParse.Service;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ImageParse
 {
@@ -8,13 +9,13 @@ namespace ImageParse
     {
         
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             WordController wC = new WordController();
             wC.onAddLog += AddLog;
 
-            SeleniumController sC = new SeleniumController();
-            sC.onAddLog += AddLog;
+            AngleSharpController asC = new AngleSharpController();
+            asC.onAddLog += AddLog;
 
 
 
@@ -23,8 +24,8 @@ namespace ImageParse
             if (File.Exists(dataPath)) dataLines = File.ReadAllLines(dataPath);
             else return;
 
-
-
+            byte[] image = await asC.ParseProductImageAsync("http://yandex.ru/images/search?text=АНТЕННА%203G%20TELEOFIS%20RC30");
+            //byte[] image = await asC.ParseProductImageAsync("http://yandex.ru");
 
             wC.CreateTable();
 
