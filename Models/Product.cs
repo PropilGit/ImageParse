@@ -16,6 +16,33 @@ namespace ImageParse.Models
             
         }
 
+        public Product(string text)
+        {
+            //1##АНТЕННА 3G TELEOFIS RC30##9834785    ##9##шт
+            try
+            {
+                string[] attr = text.Split("##");
+                if (attr.Length != 5) return;
+
+                for (int i = 0; i < attr.Length; i++)
+                {
+                    attr[i] = attr[i].Trim();
+                }
+
+                Id = Int32.Parse(attr[0]);
+                Name = attr[1];
+                InvNum = attr[2];
+                Count = float.Parse(attr[3]);
+                MeasureUnit = attr[4];
+            }
+            catch (Exception)
+            {
+
+            }
+            
+
+        }
+
         public Product(int id, string name, string invNum, float count, string measureUnit, byte[] image)
         {
             Id = id;

@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ImageParse.Service
@@ -25,31 +27,21 @@ namespace ImageParse.Service
             client = new HttpClient();
         }
 
-        public async Task<byte[]> ParseProductImageAsync(string url)
+        public async Task<byte[]> ParseProductImageAsync(string name)
         {
             try
             {
-                //string html = await GetHtmlWithHttpClient(url);
-                //string htmlT = html;
+                string url = CreateUrl(name);
+                string imgSource = await GetImgSource(url);
 
-
-                var document = await GetHtml(url);
-                IDocument test = document;
-
-                //                                          /html/body/div[4]/div[1]/div[1]/div[1]/div/div[1]/div/a/img
-                var node = document.Body.SelectSingleNode("/html/body/div[4]/div/div/div/div/div/div/a/img");
-                //var cells = document.QuerySelector("img");
-                var imgSource = node.Text();
-                int i = 1;
-                //var result = await client.GetAsync(link);
-                return null;
+                return await GetImgFile("https:"+ imgSource);
             }
             catch (Exception ex)
             {
                 return null;
             }
         }
-
+        /*
         async Task<string> GetHtmlWithHttpClient(string url)
         {
             try
@@ -69,7 +61,14 @@ namespace ImageParse.Service
                 return "";
             }
         }
+        */
 
+        string CreateUrl(string name)
+        {
+            //http://yandex.ru/images/search?text=АНТЕННА%203G%20TELEOFIS%20RC30
+            return "http://yandex.ru/images/search?text=" + name.Replace(" ", "%20");
+
+        }
         async Task<IDocument> GetHtml(string url)
         {
             try
@@ -82,6 +81,45 @@ namespace ImageParse.Service
             {
                 return null;
             }
+        }
+
+        async Task<string> GetImgSource(string url)
+        {
+            Thread.Sleep(10000);
+            var document = await GetHtml(url);
+
+            //                                         /html/body/div[4]/div[1]/div[1]/div[1]/div/div[1]/div/a/img
+            //                                         /html/body/div[4]/div/div/div/div/div/div/a/img
+            var node = document.Body.SelectSingleNode("/html/body/div/div/div/div/div/div/div/a/img");
+            var imgHtml = node.ToHtml();
+
+            int start = imgHtml.IndexOf(" src=") + 6;
+            int end = imgHtml.IndexOf(" data-error-handler=") - 1;
+            return imgHtml.Substring(start, end - start);
+            
+        }
+
+        async Task<byte[]> GetImgFile(string source)
+        {
+            try
+            {
+                return await client.GetByteArrayAsync(source);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        string FindRegExp(string text, string regExp)
+        {
+            Regex regex = new Regex(regExp);
+            MatchCollection matches = regex.Matches(text);
+            if (matches.Count > 0)
+            {
+                return matches[0].Value;
+            }
+            return "";
         }
     }
 }
